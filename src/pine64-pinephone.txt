@@ -1,8 +1,22 @@
+gpio set 114
+
+if test ${volume_key} -ne "down"; then
+  if test ${mmc_bootdev} -eq 1; then
+    setenv mmc_bootdev 0;
+    run bootcmd_mmc0;
+    setenv mmc_bootdev 1;
+    setenv devnum 1;
+  else
+    setenv mmc_bootdev 1;
+    run bootcmd_mmc1;
+    setenv mmc_bootdev 0;
+    setenv devnum 0;
+  fi;
+fi
+
 setenv kernel_addr_z 0x44080000
 
 setenv bootargs loglevel=0 silent console=tty0 vt.global_cursor_default=0
-
-gpio set 114
 
 if load ${devtype} ${devnum}:${distro_bootpart} ${kernel_addr_z} /Image.gz; then
   unzip ${kernel_addr_z} ${kernel_addr_r}
