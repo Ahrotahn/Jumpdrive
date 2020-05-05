@@ -8,3 +8,6 @@
 [submodule "src/arm-trusted-firmware"]
 	path = src/arm-trusted-firmware
 	url = https://github.com/ARM-software/arm-trusted-firmware.git
+[submodule "src/u-boot"]
+	path = src/u-boot
+	url = https://github.com/Ahrotahn/u-boot.git

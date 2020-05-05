@@ -124,7 +124,7 @@ build/atf/sun50i_a64/bl31.bin: src/arm-trusted-firmware
 	@cd src/arm-trusted-firmware; make $(CROSS_FLAGS_BOOT) PLAT=sun50i_a64 bl31
 	@cp src/arm-trusted-firmware/build/sun50i_a64/release/bl31.bin "$@"
 
-u-boot-sunxi-with-spl.bin: build/atf/sun50i_a64/bl31.bin src/u-boot
+u-boot-sunxi-with-spl.bin: build/atf/sun50i_a64/bl31.bin
 	@echo "MAKE  $@"
 	@mkdir -p build/u-boot/sun50i_a64
 	@BL31=../../../build/atf/sun50i_a64/bl31.bin $(MAKE) -C src/u-boot O=../../build/u-boot/sun50i_a64 $(CROSS_FLAGS_BOOT) pinephone_defconfig
@@ -137,7 +137,7 @@ build/atf/rk3399/bl31.elf: src/arm-trusted-firmware
 	@cd src/arm-trusted-firmware; make $(CROSS_FLAGS_BOOT) PLAT=rk3399 bl31
 	@cp src/arm-trusted-firmware/build/sun50i_a64/release/bl31/bl31.elf "$@"
 
-u-boot-rk3399.bin: build/atf/rk3399/bl31.elf src/u-boot
+u-boot-rk3399.bin: build/atf/rk3399/bl31.elf
 	@echo "MAKE  $@"
 	@mkdir -p build/u-boot/rk3399
 	@BL31=../../../build/atf/rk3399/bl31.elf $(MAKE) -C src/u-boot O=../../build/u-boot/rk3399 $(CROSS_FLAGS_BOOT) rockpro64-rk3399_defconfig
@@ -155,13 +155,6 @@ src/arm-trusted-firmware:
 	@mkdir src/arm-trusted-firmware
 	@wget https://github.com/ARM-software/arm-trusted-firmware/archive/50d8cf26dc57bb453b1a52be646140bfea4aa591.tar.gz
 	@tar -xvf 50d8cf26dc57bb453b1a52be646140bfea4aa591.tar.gz --strip-components 1 -C src/arm-trusted-firmware
-
-src/u-boot:
-	@echo "WGET  u-boot"
-	@mkdir src/u-boot
-	@wget ftp://ftp.denx.de/pub/u-boot/u-boot-2020.04.tar.bz2
-	@tar -xvf u-boot-2020.04.tar.bz2 --strip-components 1 -C src/u-boot
-	@cd src/u-boot && patch -p1 < ../u-boot-pinephone.patch
 
 
 .PHONY: clean cleanfast
