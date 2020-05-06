@@ -7,7 +7,10 @@
 	branch = pine64-kernel-5.5.y
 [submodule "src/arm-trusted-firmware"]
 	path = src/arm-trusted-firmware
-	url = https://github.com/ARM-software/arm-trusted-firmware.git
+	url = https://github.com/crust-firmware/arm-trusted-firmware.git
+[submodule "src/crust"]
+	path = src/crust
+	url = https://github.com/crust-firmware/crust.git
 [submodule "src/u-boot"]
 	path = src/u-boot
 	url = https://github.com/Ahrotahn/u-boot.git

@@ -1,5 +1,6 @@
 CROSS_FLAGS = ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu-
 CROSS_FLAGS_BOOT = CROSS_COMPILE=aarch64-linux-gnu-
+CROSS_FLAGS_SCP = HOST_COMPILE=aarch64-linux-gnu- CROSS_COMPILE=or1k-elf-
 
 all: pine64-pinephone.img.xz pine64-pinetab.img.xz
 
@@ -118,20 +119,26 @@ kernel-rockchip.gz: src/linux_config_rockchip src/linux-rockchip
 	@echo "MKIMG $@"
 	@mkimage -A arm -O linux -T script -C none -n "U-Boot boot script" -d $< $@
 	
-build/atf/sun50i_a64/bl31.bin: src/arm-trusted-firmware
+build/atf/sun50i_a64/bl31.bin:
 	@echo "MAKE  $@"
 	@mkdir -p build/atf/sun50i_a64
 	@cd src/arm-trusted-firmware; make $(CROSS_FLAGS_BOOT) PLAT=sun50i_a64 bl31
 	@cp src/arm-trusted-firmware/build/sun50i_a64/release/bl31.bin "$@"
 
-u-boot-sunxi-with-spl.bin: build/atf/sun50i_a64/bl31.bin
+build/crust/scp/scp.bin:
+	@echo "MAKE  $@"
+	@mkdir -p build/crust/scp
+	@cd src/crust; make $(CROSS_FLAGS_SCP) PLAT=sun50i_a64 BOARD=pinephone DEBUG=0 scp
+	@cp src/crust/build/scp/scp.bin "$@"
+
+u-boot-sunxi-with-spl.bin: build/atf/sun50i_a64/bl31.bin build/crust/scp/scp.bin
 	@echo "MAKE  $@"
 	@mkdir -p build/u-boot/sun50i_a64
-	@BL31=../../../build/atf/sun50i_a64/bl31.bin $(MAKE) -C src/u-boot O=../../build/u-boot/sun50i_a64 $(CROSS_FLAGS_BOOT) pinephone_defconfig
-	@BL31=../../../build/atf/sun50i_a64/bl31.bin $(MAKE) -C src/u-boot O=../../build/u-boot/sun50i_a64 $(CROSS_FLAGS_BOOT) ARCH=arm all
+	@BL31=../../../build/atf/sun50i_a64/bl31.bin SCP=../../../build/crust/scp/scp.bin $(MAKE) -C src/u-boot O=../../build/u-boot/sun50i_a64 $(CROSS_FLAGS_BOOT) pinephone_defconfig
+	@BL31=../../../build/atf/sun50i_a64/bl31.bin SCP=../../../build/crust/scp/scp.bin $(MAKE) -C src/u-boot O=../../build/u-boot/sun50i_a64 $(CROSS_FLAGS_BOOT) ARCH=arm all
 	@cp build/u-boot/sun50i_a64/u-boot-sunxi-with-spl.bin "$@"
 
-build/atf/rk3399/bl31.elf: src/arm-trusted-firmware
+build/atf/rk3399/bl31.elf:
 	@echo "MAKE  $@"
 	@mkdir -p build/atf/rk3399
 	@cd src/arm-trusted-firmware; make $(CROSS_FLAGS_BOOT) PLAT=rk3399 bl31
@@ -149,12 +156,6 @@ src/linux-rockchip:
 	@mkdir src/linux-rockchip
 	@wget https://gitlab.manjaro.org/tsys/linux-pinebook-pro/-/archive/v5.6/linux-pinebook-pro-v5.6.tar.gz
 	@tar -xvf linux-pinebook-pro-v5.6.tar.gz --strip-components 1 -C src/linux-rockchip
-
-src/arm-trusted-firmware:
-	@echo "WGET  arm-trusted-firmware"
-	@mkdir src/arm-trusted-firmware
-	@wget https://github.com/ARM-software/arm-trusted-firmware/archive/50d8cf26dc57bb453b1a52be646140bfea4aa591.tar.gz
-	@tar -xvf 50d8cf26dc57bb453b1a52be646140bfea4aa591.tar.gz --strip-components 1 -C src/arm-trusted-firmware
 
 
 .PHONY: clean cleanfast
