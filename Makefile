@@ -128,7 +128,8 @@ build/atf/sun50i_a64/bl31.bin:
 build/crust/scp/scp.bin:
 	@echo "MAKE  $@"
 	@mkdir -p build/crust/scp
-	@cd src/crust; make $(CROSS_FLAGS_SCP) PLAT=sun50i_a64 BOARD=pinephone DEBUG=0 scp
+	@cd src/crust; make $(CROSS_FLAGS_SCP) pinephone_defconfig
+	@cd src/crust; make $(CROSS_FLAGS_SCP) scp
 	@cp src/crust/build/scp/scp.bin "$@"
 
 u-boot-sunxi-with-spl.bin: build/atf/sun50i_a64/bl31.bin build/crust/scp/scp.bin
